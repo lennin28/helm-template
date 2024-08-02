@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ .Values.app.appName }}
+  namespace: {{ .Values.app.repo.name }}
+spec:
+  selector:
+    istio: {{ .Values.istio.gateway.ingressgateway }}
+  servers:
+  - hosts:
+    - {{ .Values.app.dnsName }}
+    port:
+      name: http
+      number: 80
+      protocol: HTTP
+    tls:
+      httpsRedirect: {{ .Values.istio.gateway.httpsRedirect }}
+  - hosts:
+    - {{ .Values.app.dnsName }}
+    port:
+      name: https-443
+      number: 443
+      protocol: HTTP

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.appName }}
+  namespace: {{ .Values.app.repo.name }}
+  labels:
+    app: {{ .Values.app.appName }}
+    version: {{ .Values.app.repo.tag }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.appName }}
+        version: {{ .Values.app.repo.tag }}
+        sidecar.istio.io/inject: "true"
+    spec:
+      restartPolicy: "Always"
+      containers:
+      - name: {{ .Values.app.appName }}
+        image: {{ .Values.app.repo.ecr }}/{{ .Values.app.repo.name }}:{{ .Values.app.repo.tag }}
+        imagePullPolicy: Always
+        workingDir: {{ .Values.app.appWorkdir }}
+        resources:
+          limits:
+            cpu: {{ .Values.app.resources.limits.cpu }} #maximo de cpu utilizado por el pods en prod
+            memory: {{ .Values.app.resources.limits.memory }} #maximo de memoria utilizado por el pods en prod
+          requests:
+            cpu: {{ .Values.app.resources.requests.cpu }} #minimo de cpu en prod
+            memory: {{ .Values.app.resources.requests.memory }} #minimo de memoria en prod
+        ports:
+        - containerPort: {{ .Values.app.Port }}
+          protocol: TCP
+          name: {{ .Values.app.appName }}
+        envFrom:
+          - secretRef:
+              name: {{ .Values.app.appName }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.healthCheck.readinessProbe.Path }}
+            port: {{ .Values.healthCheck.readinessProbe.Port }}
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 30
+        livenessProbe: 
+          httpGet:
+            path: {{ .Values.healthCheck.livenessProbe.Path }}
+            port: {{ .Values.healthCheck.livenessProbe.Port }}
+          initialDelaySeconds: 5
+          periodSeconds: 30
