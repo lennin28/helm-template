@@ -1,3 +1,4 @@
+{{- if .Values.istio.enabled }}
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -21,3 +22,4 @@ spec:
       name: https-443
       number: 443
       protocol: HTTP
+{{- end }}
