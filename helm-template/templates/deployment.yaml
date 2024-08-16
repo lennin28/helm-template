@@ -43,11 +43,11 @@ spec:
             path: {{ .Values.healthCheck.readinessProbe.Path }}
             port: {{ .Values.healthCheck.readinessProbe.Port }}
             scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: 15
+          periodSeconds: 30
         livenessProbe: 
           httpGet:
             path: {{ .Values.healthCheck.livenessProbe.Path }}
             port: {{ .Values.healthCheck.livenessProbe.Port }}
           initialDelaySeconds: 30
-          periodSeconds: 30
+          periodSeconds: 60
